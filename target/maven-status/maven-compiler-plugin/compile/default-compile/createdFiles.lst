@@ -1,0 +1,13 @@
+pl/poznan/put/cs/school/logic/ConnectionManager.class
+pl/poznan/put/cs/school/gui/StudentMenu.class
+pl/poznan/put/cs/school/gui/DBApp$1.class
+pl/poznan/put/cs/school/gui/TeacherMenu.class
+pl/poznan/put/cs/school/gui/DBApp.class
+pl/poznan/put/cs/school/gui/Login.class
+pl/poznan/put/cs/school/logic/Message.class
+pl/poznan/put/cs/school/gui/GradesTableModel.class
+pl/poznan/put/cs/school/gui/Login$1.class
+pl/poznan/put/cs/school/logic/SchoolManager.class
+pl/poznan/put/cs/school/logic/Presence.class
+pl/poznan/put/cs/school/gui/Login$2.class
+pl/poznan/put/cs/school/logic/UserType.class
