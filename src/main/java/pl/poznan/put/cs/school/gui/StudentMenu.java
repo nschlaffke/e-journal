@@ -1,6 +1,7 @@
 package pl.poznan.put.cs.school.gui;
 
 import pl.poznan.put.cs.school.logic.SchoolManager;
+import pl.poznan.put.cs.school.structures.Student;
 
 import javax.swing.*;
 import javax.swing.table.TableModel;
@@ -19,15 +20,27 @@ class StudentMenu extends JFrame
     private JPanel panel;
     private JTable gradesTable;
     private JTable presenceTable;
+    private JLabel nameLabel;
     private final int personID;
 
     public StudentMenu(Connection con, SchoolManager schoolManager, int personID)
     {
-        super("Student menu");
+
+        super("Menu ucznia");
+        Student student = null;
+        try
+        {
+            student = schoolManager.getStudentsData(personID);
+        }
+        catch (SQLException e)
+        {
+            System.err.println("Failed to get students data");
+        }
+        nameLabel.setText(student.toString());
         this.con = con;
         this.schoolManager = schoolManager;
         this.personID = personID;
-        setSize(300, 205);
+        setSize(800, 800);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         try
@@ -51,8 +64,8 @@ class StudentMenu extends JFrame
         for (String subject : subjects)
         {
             List<Integer> grades = schoolManager.getGrades(personID, subject);
-            System.out.println(grades);
-            System.out.println(subject);
+            // System.out.println(grades);
+            // System.out.println(subject);
             data[counter] = new Object[2];
             data[counter][0] = subject;
             StringBuilder gradesString = new StringBuilder();

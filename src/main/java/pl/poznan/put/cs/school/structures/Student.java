@@ -14,6 +14,11 @@ public class Student
         this.surname = surname;
     }
 
+    public int getID()
+    {
+        return ID;
+    }
+
     @Override
     public String toString()
     {

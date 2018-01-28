@@ -7,11 +7,11 @@ import javax.swing.table.AbstractTableModel;
  */
 class GradesTableModel extends AbstractTableModel
 {
-    private String columnNames[];
+    private String columnNames[] = {"Uczeń", "Oceny"};
 
-    public GradesTableModel(String[] columnNames, Object[][] data)
+    public GradesTableModel(Object[][] data)
     {
-        this.columnNames = columnNames;
+        super();
         this.data = data;
     }
 

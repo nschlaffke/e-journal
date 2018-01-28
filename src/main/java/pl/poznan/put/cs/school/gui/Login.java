@@ -17,30 +17,28 @@ class Login extends JFrame
 {
     private JPanel Panel;
     private JButton loginButton;
-    private JTextArea statusTextArea;
     private JTextField userNameField;
     private JPasswordField userPasswordField;
     private ConnectionManager connectionManager;
     private static final String SEPARATOR = "_";
     public Login()
     {
-        super("Login");
-        setSize(300, 205);
+        super("Dziennik szkolny");
+        JFrame parent = this;
+        setSize(300, 300);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setContentPane(Panel);
         setVisible(true);
         //setResizable(false);
-        statusTextArea.setWrapStyleWord(true);
-        statusTextArea.setLineWrap(true);
         loginButton.addActionListener(new ActionListener()
         {
             @Override
             public void actionPerformed(ActionEvent e)
             {
                 /*
-                String userName = new String(userNameField.getText());
-                String password = new String(userPasswordField.getPassword());
+                String userName = userNameField.getText();
+                String password = String.valueOf(userPasswordField.getPassword());
                 */
                 String userName = "joanna_kownacka";
                 String password = "joanna_kownacka";
@@ -52,22 +50,13 @@ class Login extends JFrame
                 {
                     connectionManager = new ConnectionManager("localhost", "szkola");
                 }
-                catch (InstantiationException e1)
+                catch (InstantiationException | IllegalAccessException | ClassNotFoundException e1)
                 {
-                    e1.printStackTrace();
-                }
-                catch (IllegalAccessException e1)
-                {
-                    e1.printStackTrace();
-                }
-                catch (ClassNotFoundException e1)
-                {
-                    e1.printStackTrace();
+                    JOptionPane.showMessageDialog(parent, "Błąd logowania");
                 }
                 try
                 {
                     Connection con = connectionManager.connect(userName, password);
-                    statusTextArea.append("Connected");
                     SchoolManager schoolManager = new SchoolManager(con);
                     String[] user = userName.split(SEPARATOR);
                     UserType userType = schoolManager.getUserType(user[0], user[1]);
@@ -85,7 +74,7 @@ class Login extends JFrame
                 }
                 catch (SQLException ex)
                 {
-                    statusTextArea.append(ex.getLocalizedMessage() + '\n');
+                    JOptionPane.showMessageDialog(parent, "Błąd logowania:\n" + ex.getLocalizedMessage());
                 }
             }
         });

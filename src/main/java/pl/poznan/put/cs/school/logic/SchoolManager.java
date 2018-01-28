@@ -34,6 +34,9 @@ public final class SchoolManager
     private PreparedStatement getClassListStmt;
     private PreparedStatement getStudentsForClassStmt;
     private PreparedStatement getSubjectsListForClassStmt;
+    private PreparedStatement getSubjectsTaughtInClassStmt;
+    private PreparedStatement getStudentsDataStmt;
+    private PreparedStatement getLessonsListStmt;
     private Connection con;
 
     public SchoolManager(Connection con)
@@ -45,15 +48,15 @@ public final class SchoolManager
             getIdStmt = con.prepareStatement("SELECT id FROM osoby WHERE imie = ? AND nazwisko = ?");
             insertLessonStmt = con.prepareStatement("INSERT INTO lekcje(data_godzina, id_przedmiotu)"
                     + " VALUES (?,?)");
-            insertGradeStmt = con.prepareStatement("INSERT INTO oceny(id_osoby, id_lekcji, stopien)" +
+            insertGradeStmt = con.prepareStatement("INSERT INTO oceny(id_osoby, nazwa_przedmiotu, stopien)" +
                     " VALUES(?,?,?)");
             insertPresenceStmt = con.prepareStatement("INSERT INTO obecnosci" +
                     "(id_lekcji, czy_obecny, id_ucznia)  VALUES(?,?,?)");
             insertStudentStmt = con.prepareStatement("INSERT INTO " +
                     "osoby(imie, nazwisko, czy_uczen, id_klasy) VALUES(?,?,?,?)");
             insertSubjectStmt = con.prepareStatement("INSERT INTO przedmioty(nazwa) VALUES (?)");
-            getGradesStmt = con.prepareStatement("select stopien FROM oceny o JOIN lekcje l ON o.id_lekcji = l.id " +
-                    "JOIN przedmioty_w_planach p ON l.id_przedmiotu = p.id WHERE nazwa = ? AND id_osoby = ?");
+            getGradesStmt = con.prepareStatement("SELECT stopien FROM oceny " +
+                    "WHERE nazwa_przedmiotu = ? AND id_osoby = ?");
             getUserTypeStmt = con.prepareStatement("SELECT czy_uczen, czy_rodzic, czy_nauczyciel " +
                     "FROM osoby WHERE imie = ? AND nazwisko = ?");
             getPresenceStmt = con.prepareStatement("SELECT data_godzina, czy_obecny " +
@@ -66,15 +69,61 @@ public final class SchoolManager
             getClassIDStmt = con.prepareStatement("SELECT id_klasy FROM osoby WHERE id = ?");
             getSubjectNameStmt = con.prepareStatement("SELECT nazwa FROM przedmioty_w_planach WHERE id = ?");
             getSubjectsListForStudentStmt = con.prepareStatement("SELECT nazwa FROM przedmioty_w_planach WHERE id_klasy = ?");
-            getClassListStmt = con.prepareStatement("select id, numer, litera FROM klasy ORDER BY numer, litera");
-            getStudentsForClassStmt = con.prepareStatement("SELECT id, imie, nazwisko FROM osoby where id_klasy = ?");
+            getClassListStmt = con.prepareStatement("SELECT id, numer, litera FROM klasy ORDER BY numer, litera");
+            getStudentsForClassStmt = con.prepareStatement("SELECT id, imie, nazwisko FROM osoby WHERE id_klasy = ?");
             getSubjectsListForClassStmt = con.prepareStatement("SELECT DISTINCT nazwa FROM przedmioty_w_planach WHERE id_klasy = ?");
+            getSubjectsTaughtInClassStmt = con.prepareStatement("SELECT DISTINCT nazwa FROM przedmioty_w_planach " +
+                    "WHERE id_nauczyciela = ? AND id_klasy = ?;");
+            getStudentsDataStmt = con.prepareStatement("SELECT imie, nazwisko FROM osoby WHERE id = ?");
+            getLessonsListStmt = con.prepareStatement("SELECT id, data_godzina FROM lekcje " +
+                    "WHERE id_przedmiotu IN (SELECT id  FROM przedmioty_w_planach WHERE nazwa = ? AND id_klasy = ?) " +
+                    "ORDER BY data_godzina DESC");
         }
         catch (SQLException e)
         {
-            e.printStackTrace();
+            System.err.println("Failed to prepare statements");
         }
     }
+
+    public List<Lesson> getLessonsList(String subject, int classId) throws SQLException
+    {
+        getLessonsListStmt.setString(1, subject);
+        getLessonsListStmt.setInt(2, classId);
+        ResultSet resultSet = getLessonsListStmt.executeQuery();
+        List<Lesson> lessons = new ArrayList<>();
+        while (resultSet.next())
+        {
+           int id = resultSet.getInt(1);
+           String date = resultSet.getString(2);
+           date = date.substring(0, date.lastIndexOf(':'));
+           lessons.add(new Lesson(id, date));
+        }
+        return lessons;
+    }
+    public Student getStudentsData(int id) throws SQLException
+    {
+        getStudentsDataStmt.setInt(1, id);
+        ResultSet resultSet = getStudentsDataStmt.executeQuery();
+        resultSet.next();
+        String name = resultSet.getString(1);
+        String surname = resultSet.getString(2);
+        return new Student(id, name, surname);
+    }
+
+    public List<String> getSubjectsTaughtInClass(int classId, int teacherId) throws SQLException
+    {
+        getSubjectsTaughtInClassStmt.setInt(1, teacherId);
+        getSubjectsTaughtInClassStmt.setInt(2, classId);
+        ResultSet resultSet = getSubjectsTaughtInClassStmt.executeQuery();
+        List<String> subjects = new ArrayList<>();
+        while (resultSet.next())
+        {
+            String subject = resultSet.getString(1);
+            subjects.add(subject);
+        }
+        return subjects;
+    }
+
     public List<String> getSubjectsListForClass(int classID) throws SQLException
     {
         getSubjectsListForClassStmt.setInt(1, classID);
@@ -87,6 +136,7 @@ public final class SchoolManager
         }
         return subjects;
     }
+
     public List<Student> getStudentsForClass(int classID) throws SQLException
     {
         getStudentsForClassStmt.setInt(1, classID);
@@ -100,11 +150,12 @@ public final class SchoolManager
         }
         return students;
     }
+
     public List<ClassData> getClassList() throws SQLException
     {
         ResultSet resultSet = getClassListStmt.executeQuery();
         List<ClassData> classes = new ArrayList<>();
-        while(resultSet.next())
+        while (resultSet.next())
         {
             ClassData sample_class = new ClassData(resultSet.getInt(1),
                     resultSet.getInt(2), resultSet.getString(3)
@@ -113,10 +164,11 @@ public final class SchoolManager
         }
         return classes;
     }
-    public void insertGrade(int personID, int lessonID, int grade) throws SQLException
+
+    public void insertGrade(int personID, String subject, int grade) throws SQLException
     {
         insertGradeStmt.setInt(1, personID);
-        insertGradeStmt.setInt(2, lessonID);
+        insertGradeStmt.setString(2, subject);
         insertGradeStmt.setInt(3, grade);
         insertGradeStmt.executeUpdate();
     } // TESTED
@@ -277,7 +329,7 @@ public final class SchoolManager
         getSubjectsListForStudentStmt.setInt(1, classID);
         ResultSet rs = getSubjectsListForStudentStmt.executeQuery();
         List<String> subjectList = new ArrayList<>();
-        while(rs.next())
+        while (rs.next())
         {
             String subject = rs.getString(1);
             subjectList.add(subject);
