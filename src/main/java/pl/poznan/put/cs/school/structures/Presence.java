@@ -5,13 +5,34 @@ package pl.poznan.put.cs.school.structures;
  */
 public class Presence
 {
-    private final String date;
-    private final boolean isPresent;
+    private String date;
+    private Boolean isPresent = null;
 
-    public Presence(String date, boolean isPresent)
+    public Presence(Lesson lesson, Boolean isPresent)
+    {
+        this(lesson.toString(), isPresent);
+    }
+    public Presence(String date, Boolean isPresent)
     {
         this.date = date;
         this.isPresent = isPresent;
+    }
+
+    @Override
+    public String toString()
+    {
+        if (isPresent == null)
+        {
+            return "??";
+        }
+        if (isPresent)
+        {
+            return "ob";
+        }
+        else
+        {
+            return "nb";
+        }
     }
 
     public String getDate()

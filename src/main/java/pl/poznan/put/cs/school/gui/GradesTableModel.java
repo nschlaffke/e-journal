@@ -7,15 +7,16 @@ import javax.swing.table.AbstractTableModel;
  */
 class GradesTableModel extends AbstractTableModel
 {
-    private String columnNames[] = {"Uczeń", "Oceny"};
+    private int columnCount;
+    private Object data[][];
 
-    public GradesTableModel(Object[][] data)
+    public GradesTableModel(Object[][] data, int columnCount)
     {
         super();
         this.data = data;
+        this.columnCount = columnCount;
     }
 
-    private Object data[][];
     /**
      * Returns the number of rows in the model. A
      * <code>JTable</code> uses this method to determine how many rows it
@@ -42,7 +43,7 @@ class GradesTableModel extends AbstractTableModel
     @Override
     public int getColumnCount()
     {
-        return columnNames.length;
+        return columnCount;
     }
 
     /**
@@ -56,7 +57,14 @@ class GradesTableModel extends AbstractTableModel
     @Override
     public String getColumnName(int column)
     {
-        return columnNames[column];
+        if (column == 0)
+        {
+            return "Uczeń";
+        }
+        else
+        {
+            return String.valueOf(column);
+        }
     }
 
     /**
@@ -70,6 +78,10 @@ class GradesTableModel extends AbstractTableModel
     @Override
     public Object getValueAt(int rowIndex, int columnIndex)
     {
+        if(data[rowIndex][columnIndex] == null)
+        {
+            return "";
+        }
         return data[rowIndex][columnIndex];
     }
 }

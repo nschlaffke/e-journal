@@ -12,6 +12,12 @@ public class Lesson
         this.id = id;
         this.date = date;
     }
+
+    public int getId()
+    {
+        return id;
+    }
+
     @Override
     public String toString()
     {

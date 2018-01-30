@@ -36,16 +36,8 @@ class Login extends JFrame
             @Override
             public void actionPerformed(ActionEvent e)
             {
-                /*
                 String userName = userNameField.getText();
                 String password = String.valueOf(userPasswordField.getPassword());
-                */
-                String userName = "joanna_kownacka";
-                String password = "joanna_kownacka";
-                /*
-                String userName = "jan_kowalski";
-                String password = "jan_kowalski";
-                */
                 try
                 {
                     connectionManager = new ConnectionManager("localhost", "szkola");

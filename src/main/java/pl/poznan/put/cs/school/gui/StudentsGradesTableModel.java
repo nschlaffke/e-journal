@@ -7,12 +7,13 @@ import javax.swing.table.AbstractTableModel;
  */
 class StudentsGradesTableModel extends AbstractTableModel
 {
-    private String[] columnNames = {"Przedmioty", "Oceny"};
     private Object[][] data;
-    public StudentsGradesTableModel(Object[][] data)
+    private int columnCount;
+    public StudentsGradesTableModel(Object[][] data, int columnCount)
     {
         super();
         this.data = data;
+        this.columnCount = columnCount;
     }
 
     /**
@@ -41,7 +42,7 @@ class StudentsGradesTableModel extends AbstractTableModel
     @Override
     public int getColumnCount()
     {
-        return columnNames.length;
+        return columnCount;
     }
 
     /**
@@ -55,7 +56,14 @@ class StudentsGradesTableModel extends AbstractTableModel
     @Override
     public String getColumnName(int column)
     {
-        return columnNames[column];
+        if(column == 0)
+        {
+            return "Przedmiot";
+        }
+        else
+        {
+            return String.valueOf(column);
+        }
     }
 
     /**
@@ -69,6 +77,8 @@ class StudentsGradesTableModel extends AbstractTableModel
     @Override
     public Object getValueAt(int rowIndex, int columnIndex)
     {
+        if (data[rowIndex][columnIndex] == null)
+            return "";
         return data[rowIndex][columnIndex];
     }
 }

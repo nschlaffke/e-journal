@@ -14,6 +14,17 @@ public class Student
         this.surname = surname;
     }
 
+    @Override
+    public boolean equals(Object o)
+    {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Student student = (Student) o;
+
+        return ID == student.ID;
+    }
+
     public int getID()
     {
         return ID;
