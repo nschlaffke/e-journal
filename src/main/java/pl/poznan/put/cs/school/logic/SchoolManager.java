@@ -18,21 +18,9 @@ public final class SchoolManager
     private PreparedStatement getSubjectsStmt;
     private PreparedStatement getIdStmt;
     private PreparedStatement insertGradeStmt;
-    /*
-    private PreparedStatement insertLessonStmt;
-    private PreparedStatement insertPresenceStmt;
-    private PreparedStatement insertStudentStmt;
-    private PreparedStatement insertSubjectStmt;
-    */
     private PreparedStatement getGradesStmt;
     private PreparedStatement getUserTypeStmt;
     private PreparedStatement getPresenceStmt;
-    /*
-    private PreparedStatement insertMessageStmt;
-    private PreparedStatement getMessagesStmt;
-    private PreparedStatement getSubjectIDsForStudentStmt;
-    private PreparedStatement getSubjectNameStmt;
-    */
     private PreparedStatement getSubjectsListForStudentStmt;
     private PreparedStatement getClassIDStmt;
     private PreparedStatement getClassListStmt;
@@ -57,15 +45,6 @@ public final class SchoolManager
             getIdStmt = con.prepareStatement("SELECT id FROM osoby WHERE imie = ? AND nazwisko = ?");
             insertGradeStmt = con.prepareStatement("INSERT INTO oceny(id_osoby, nazwa_przedmiotu, stopien)" +
                     " VALUES(?,?,?)");
-            /*
-            insertLessonStmt = con.prepareStatement("INSERT INTO lekcje(data_godzina, id_przedmiotu)"
-                    + " VALUES (?,?)");
-            insertPresenceStmt = con.prepareStatement("INSERT INTO obecnosci" +
-                    "(id_lekcji, czy_obecny, id_ucznia)  VALUES(?,?,?)");
-            insertStudentStmt = con.prepareStatement("INSERT INTO " +
-                    "osoby(imie, nazwisko, czy_uczen, id_klasy) VALUES(?,?,?,?)");
-            insertSubjectStmt = con.prepareStatement("INSERT INTO przedmioty(nazwa) VALUES (?)");
-            */
             getGradesStmt = con.prepareStatement("SELECT stopien FROM oceny " +
                     "WHERE nazwa_przedmiotu = ? AND id_osoby = ?");
             getUserTypeStmt = con.prepareStatement("SELECT czy_uczen, czy_rodzic, czy_nauczyciel " +
@@ -73,15 +52,7 @@ public final class SchoolManager
             getPresenceStmt = con.prepareStatement("SELECT data_godzina, czy_obecny " +
                     "FROM obecnosci o JOIN lekcje l ON o.id_lekcji = l.id " +
                     "WHERE id_przedmiotu = ? AND id_ucznia = ? ORDER BY data_godzina ASC");
-            /*insertMessageStmt = con.prepareStatement("INSERT INTO " +
-                    "wiadomosci(id_nadawcy, id_odbiorcy, tresc) VALUES(?,?,?)");
-            getMessagesStmt = con.prepareStatement("SELECT tresc, tytul, data FROM wiadomosci WHERE id_odbiorcy = ?");
-            getSubjectIDsForStudentStmt = con.prepareStatement("SELECT id FROM przedmioty_w_planach WHERE id_klasy = ?");
-            */
             getClassIDStmt = con.prepareStatement("SELECT id_klasy FROM osoby WHERE id = ?");
-            /*
-            getSubjectNameStmt = con.prepareStatement("SELECT nazwa FROM przedmioty_w_planach WHERE id = ?");
-            */
             getSubjectsListForStudentStmt = con.prepareStatement("SELECT DISTINCT nazwa FROM przedmioty_w_planach WHERE id_klasy = ?");
             getClassListStmt = con.prepareStatement("SELECT id, numer, litera FROM klasy ORDER BY numer, litera");
             getStudentsForClassStmt = con.prepareStatement("SELECT id, imie, nazwisko FROM osoby WHERE id_klasy = ?");
@@ -331,47 +302,7 @@ public final class SchoolManager
         }
         return presenceList;
     } // TESTED
-
-    /*
-    public void insertStudent(String imie, String nazwisko, int id_klasy) throws SQLException
-    {
-        insertStudentStmt.setString(1, imie);
-        insertStudentStmt.setString(2, nazwisko);
-        insertStudentStmt.setBoolean(3, true);
-        insertStudentStmt.setInt(4, id_klasy);
-        insertStudentStmt.executeUpdate();
-    } // TESTED
-
-    public void insertMessage(int senderID, int recieverID, String text) throws SQLException
-    {
-        insertMessageStmt.setInt(1, senderID);
-        insertMessageStmt.setInt(2, recieverID);
-        insertMessageStmt.setString(3, text);
-        insertMessageStmt.executeUpdate();
-    } // TESTED
-
-    public List<Message> getMessages(int recieverID) throws SQLException
-    {
-        getMessagesStmt.setInt(1, recieverID);
-        List<Message> messageList = new ArrayList<>();
-        ResultSet resultSet = getMessagesStmt.executeQuery();
-        while (resultSet.next())
-        {
-            String content = resultSet.getString(1);
-            String title = resultSet.getString(2);
-            String date = resultSet.getString(3);
-            Message message = new Message(content, title, date);
-            messageList.add(message);
-        }
-        return messageList;
-    } // TESTED
-
-    public void insertSubject(String name) throws SQLException
-    {
-        insertSubjectStmt.setString(1, name);
-        insertSubjectStmt.executeUpdate();
-    } // TESTED
-    */
+    
     public List<String> getSubjectsList() throws SQLException
     {
         ResultSet resultSet = getSubjectsStmt.executeQuery();
@@ -410,21 +341,7 @@ public final class SchoolManager
         rs.next();
         return rs.getInt(1);
     }
-    /*
-    public List<Integer> getSubjectIDsForStudent(int personID) throws SQLException
-    {
-        int classID = getClassId(personID);
-        getSubjectIDsForStudentStmt.setInt(1, classID);
-        List<Integer> subjectList = new ArrayList<>();
-        ResultSet resultSet = getSubjectIDsForStudentStmt.executeQuery();
-        while (resultSet.next())
-        {
-            int subjectID = resultSet.getInt(1);
-            subjectList.add(subjectID);
-        }
-        return subjectList;
-    }
-    */
+
     public int getClassId(int studentID) throws SQLException
     {
         getClassIDStmt.setInt(1, studentID);
@@ -432,23 +349,7 @@ public final class SchoolManager
         resultSet.next();
         return resultSet.getInt(1);
     }
-    /*
-    public void insertLesson(String timeStamp, int subjectId) throws SQLException
-    {
-        insertLessonStmt.setString(1, timeStamp);
-        insertLessonStmt.setInt(2, subjectId);
-        insertLessonStmt.executeUpdate();
-    }
-    */
-    /*
-    public String getSubjectName(int subjectID) throws SQLException
-    {
-        getSubjectNameStmt.setInt(1, subjectID);
-        ResultSet resultSet = getSubjectNameStmt.executeQuery();
-        resultSet.next();
-        return resultSet.getString(1);
-    }
-    */
+
     public List<String> getSubjectsListForStudent(int personID) throws SQLException
     {
         int classID = getClassId(personID);
